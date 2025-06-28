@@ -1,0 +1,17 @@
+# Sample TikTok URLs for testing
+# This file demonstrates the format expected by tiktok_downloader_v2.py
+
+# Video examples (replace with actual URLs)
+https://www.tiktok.com/@exampleuser/video/1234567890123456789
+
+# Photo slideshow examples (replace with actual URLs) 
+https://www.tiktok.com/@exampleuser/photo/9876543210987654321
+
+# The downloader will automatically skip these types:
+# https://www.tiktok.com/tag/viral
+# https://www.tiktok.com/@username
+# https://www.tiktok.com/music/song-123
+
+# Comments and blank lines are ignored
+
+# Add your actual TikTok URLs below: 
