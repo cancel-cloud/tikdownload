@@ -159,6 +159,11 @@ done
 - **Workaround**: Focus on video URLs which work reliably
 - **Alternative**: Use TikTok's native save feature or browser screenshots
 
+**🚫 Age-Restricted Videos Fail to Download**
+- **Issue**: Videos marked as sensitive or age-restricted by TikTok fail to download with an authentication error.
+- **Reason**: Downloading this content requires being logged into a TikTok account, which involves passing browser cookies to the downloader. This functionality is not yet implemented.
+- **Future Support**: This may be added in the future. In the meantime, pull requests from the community to implement cookie-based authentication are welcome!
+
 **Environment Issues**
 - **Conda users**: Always activate environment first: `conda activate tiktokdownloader`
 - **Python not found**: Use `python` instead of `python3` in conda environments
