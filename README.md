@@ -67,10 +67,15 @@ https://www.tiktok.com/@another/video/5555555555
 ### 3. Run the Downloader
 
 ```bash
+# Download and automatically rename files (default)
+python tiktok_downloader_v2.py sample_urls.txt
+
+# Download without renaming
+python tiktok_downloader_v2.py sample_urls.txt --no-rename
+
+# Run interactively
 python tiktok_downloader_v2.py
 ```
-
-Enter the path to your URLs file when prompted.
 
 ## 📁 Scripts Overview
 
@@ -79,11 +84,17 @@ The enhanced downloader with modern TikTok support:
 - **Input**: Text file with URLs (one per line)
 - **Features**: Video + slideshow support, robust error handling
 - **Output**: `downloads-DD-MM-YYYY/` folder with organized content
+- **Usage**: `python tiktok_downloader_v2.py [path_to_urls.txt] [--no-rename]`
 
 ### `convert_csv_to_txt.py`
 Utility to convert existing CSV files to the new TXT format:
+- **Usage**: `python convert_csv_to_txt.py [path_to_file.csv]`
 ```bash
+# By providing the file as an argument
 python convert_csv_to_txt.py your_file.csv
+
+# Or run it and enter the path when prompted
+python convert_csv_to_txt.py
 ```
 
 ### Legacy Scripts
@@ -128,108 +139,10 @@ downloads-DD-MM-YYYY/
 
 ## 🛠️ Advanced Usage
 
+### Command-line Options for `tiktok_downloader_v2.py`
+- `[input_file]`: (Optional) Path to your URLs file. If omitted, you will be prompted to enter it.
+- `--no-rename`: (Optional) Prevents the script from automatically renaming downloaded videos based on their titles. By default, files are renamed.
+
 ### Resume Interrupted Downloads
 The downloader automatically detects incomplete downloads:
 ```
-🔄 Resume from line 47? (y/n): y
-```
-
-### Custom Output Locations
-Modify the `output_folder` variable in the script:
-```python
-output_folder = f"my_downloads-{date_str}"
-```
-
-### Batch Processing
-Process multiple URL files:
-```bash
-for file in *.txt; do
-    echo "Processing $file..."
-    python tiktok_downloader_v2.py < <(echo "$file")
-done
-```
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-**⚠️ TikTok Photo Slideshows Not Working**
-- **Issue**: TikTok changed their architecture - photo content loads dynamically
-- **Status**: `/photo/` URLs have limited support
-- **Workaround**: Focus on video URLs which work reliably
-- **Alternative**: Use TikTok's native save feature or browser screenshots
-
-**🚫 Age-Restricted Videos Fail to Download**
-- **Issue**: Videos marked as sensitive or age-restricted by TikTok fail to download with an authentication error.
-- **Reason**: Downloading this content requires being logged into a TikTok account, which involves passing browser cookies to the downloader. This functionality is not yet implemented.
-- **Future Support**: This may be added in the future. In the meantime, pull requests from the community to implement cookie-based authentication are welcome!
-
-**Environment Issues**
-- **Conda users**: Always activate environment first: `conda activate tiktokdownloader`
-- **Python not found**: Use `python` instead of `python3` in conda environments
-- **Path issues**: Run scripts from the project directory
-
-**"Could not find JSON data in page"**
-- TikTok may have changed their page structure
-- Try waiting a few minutes and retry
-- Check if the URL is accessible in your browser
-
-**"Brotli decompression failed"**
-- Fixed in v2 by excluding brotli encoding
-- If you see this error, update to the latest version
-
-**"Video download failed, trying slideshow..."**
-- Normal behavior - the script automatically tries alternative methods
-- Some URLs may be geo-restricted or require login
-
-**Rate Limiting**
-- Add delays between downloads if you get blocked:
-```python
-time.sleep(2)  # Add after each download
-```
-
-### Debug Mode
-For detailed debugging, save HTML content:
-```python
-# In extract_slideshow_images(), uncomment:
-with open('debug.html', 'w') as f:
-    f.write(html_content)
-```
-
-## 🔄 Migration from Old Scripts
-
-### From CSV to TXT Format
-```bash
-python convert_csv_to_txt.py your_old_file.csv
-# Creates: your_old_file_urls.txt
-```
-
-### From German to English Interface
-The new script uses English interface but maintains all functionality:
-- Progress saving ✓
-- Error logging ✓  
-- Metadata extraction ✓
-- Resume capability ✓
-
-## 📋 URL Types Supported
-
-- ✅ **Videos**: `tiktok.com/@user/video/123` (Full support)
-- ⚠️ **Photo Slideshows**: `tiktok.com/@user/photo/123` (Limited support due to TikTok changes)
-- ❌ **Tag Pages**: `tiktok.com/tag/viral` (Automatically skipped)
-- ❌ **User Profiles**: `tiktok.com/@user` (Automatically skipped)
-- ❌ **Music Pages**: `tiktok.com/music/song-123` (Automatically skipped)
-
-## 🤝 Contributing
-
-The codebase is modular and extensible:
-- Add new JSON extraction patterns in `extract_slideshow_images()`
-- Extend URL validation in `validate_tiktok_url()`
-- Add new output formats in the download methods
-
-## 📜 License
-
-See `LICENSE` file for details.
-
----
-
-**Note**: This tool is for personal use only. Respect TikTok's terms of service and content creators' rights.

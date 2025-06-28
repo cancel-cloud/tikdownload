@@ -91,10 +91,16 @@ def main():
     print("🔄 CSV to TXT Converter for TikTok Downloader")
     print("=" * 50)
     
-    if len(sys.argv) > 1:
-        csv_file = sys.argv[1]
-    else:
-        csv_file = input("📁 Enter path to CSV file: ").strip()
+    csv_file = ""
+    try:
+        if len(sys.argv) > 1:
+            csv_file = sys.argv[1]
+            print(f"📁 Using CSV file: {csv_file}")
+        else:
+            csv_file = input("📁 Enter path to CSV file: ").strip()
+    except KeyboardInterrupt:
+        print("\n👋 Operation cancelled by user. Exiting.")
+        sys.exit(0)
     
     if not os.path.exists(csv_file):
         print(f"❌ File not found: {csv_file}")

@@ -385,6 +385,62 @@ class TikTokDownloader:
         if self.error_file:
             self.error_file.close()
 
+    def rename_files_from_metadata(self):
+        """Renames downloaded video files based on metadata.csv."""
+        if not os.path.exists(self.metadata_file):
+            print("\nℹ️  metadata.csv not found, skipping renaming.")
+            return
+
+        print("\nRenaming files...")
+        renamed_count = 0
+        rename_errors = 0
+        
+        try:
+            with open(self.metadata_file, 'r', newline='', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                videos_to_rename = list(reader)
+                
+            for row in videos_to_rename:
+                original_filename = row.get('filename')
+                video_title = row.get('title')
+
+                if not original_filename or not video_title:
+                    continue
+
+                if video_title.startswith('#'):
+                    video_title = video_title[1:].lstrip()
+
+                old_path = os.path.join(self.output_folder, original_filename)
+                if os.path.exists(old_path) and os.path.isfile(old_path):
+                    try:
+                        file_ext = os.path.splitext(original_filename)[1]
+                        sanitized_title = self.sanitize_filename(video_title)
+
+                        if not sanitized_title:
+                            print(f"  ⚠️  Skipping rename for '{original_filename}' due to empty title after sanitizing.")
+                            continue
+
+                        new_filename = f"{sanitized_title}{file_ext}"
+                        new_path = os.path.join(self.output_folder, new_filename)
+                        
+                        if old_path == new_path:
+                            continue
+
+                        if os.path.exists(new_path):
+                            print(f"  ⚠️  Skipping rename: '{new_filename}' already exists.")
+                            continue
+                            
+                        os.rename(old_path, new_path)
+                        print(f"  ✓ Renamed '{original_filename}' to '{new_filename}'")
+                        renamed_count += 1
+                    except Exception as e:
+                        print(f"  ❌ Error renaming '{original_filename}': {e}")
+                        rename_errors += 1
+        except Exception as e:
+            print(f"❌ Error reading metadata file for renaming: {e}")
+
+        print(f"\n✅ Renaming complete. {renamed_count} files renamed, {rename_errors} errors.")
+
 def load_urls_from_file(file_path: str) -> List[str]:
     """Load URLs from text file"""
     urls = []
@@ -403,8 +459,23 @@ def main():
     print("🚀 Enhanced TikTok Downloader v2")
     print("=" * 50)
     
-    # Get input file
-    input_file = input("📁 Enter path to URLs file (txt): ").strip()
+    # Basic argument parsing
+    args = [arg for arg in sys.argv[1:] if not arg.startswith('--')]
+    flags = [arg for arg in sys.argv[1:] if arg.startswith('--')]
+
+    input_file = ""
+    rename_files = '--no-rename' not in flags
+
+    try:
+        if args:
+            input_file = args[0]
+            print(f"📁 Using URLs file: {input_file}")
+        else:
+            input_file = input("📁 Enter path to URLs file (txt): ").strip()
+    except KeyboardInterrupt:
+        print("\n👋 Operation cancelled by user. Exiting.")
+        sys.exit(0)
+
     if not os.path.exists(input_file):
         print(f"❌ File not found: {input_file}")
         sys.exit(1)
@@ -460,6 +531,12 @@ def main():
             if os.path.exists(downloader.progress_file):
                 os.remove(downloader.progress_file)
             print("✅ Download completed!")
+            
+            # Conditionally rename files
+            if rename_files:
+                downloader.rename_files_from_metadata()
+            else:
+                print("\n⏭️  Skipping file renaming as per --no-rename flag.")
         
     except KeyboardInterrupt:
         print("\n⚠️  Download interrupted")
